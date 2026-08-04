@@ -50,9 +50,9 @@ fun SwipeCardStack(
 
             // Current card (foreground with gestures)
             val profile = profiles[currentIndex]
-            val offsetX = remember { Animatable(0f) }
-            val offsetY = remember { Animatable(0f) }
-            val rotation = remember { Animatable(0f) }
+            val offsetX = remember(currentIndex) { Animatable(0f) }
+            val offsetY = remember(currentIndex) { Animatable(0f) }
+            val rotation = remember(currentIndex) { Animatable(0f) }
             
             val configuration = LocalConfiguration.current
             val density = LocalDensity.current
@@ -61,44 +61,43 @@ fun SwipeCardStack(
             ProfileCard(
                 profile = profile,
                 modifier = Modifier
-                .graphicsLayer {
-                    translationX = offsetX.value
-                    translationY = offsetY.value
-                    rotationZ = rotation.value
-                }
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragEnd = {
-                            scope.launch {
-                                if (abs(offsetX.value) > screenWidthPx / 3) {
-                                    // Swipe away
-                                    val targetX = if (offsetX.value > 0) screenWidthPx * 2 else -screenWidthPx * 2
-                                    launch { offsetX.animateTo(targetX, tween(300)) }
-
-                                    if (offsetX.value > 0) onSwipeRight(profile) else onSwipeLeft(profile)
-
-                                    currentIndex++
-                                    offsetX.snapTo(0f)
-                                    offsetY.snapTo(0f)
-                                    rotation.snapTo(0f)
-                                } else {
-                                    // Return to center
-                                    launch { offsetX.animateTo(0f, tween(300)) }
-                                    launch { offsetY.animateTo(0f, tween(300)) }
-                                    launch { rotation.animateTo(0f, tween(300)) }
+                    .graphicsLayer {
+                        translationX = offsetX.value
+                        translationY = offsetY.value
+                        rotationZ = rotation.value
+                    }
+                    .pointerInput(currentIndex) {
+                        detectDragGestures(
+                            onDragEnd = {
+                                scope.launch {
+                                    if (abs(offsetX.value) > screenWidthPx / 3) {
+                                        // Swipe away
+                                        val targetX = if (offsetX.value > 0) screenWidthPx * 2 else -screenWidthPx * 2
+                                        
+                                        // Await the animation to finish before moving to next index
+                                        offsetX.animateTo(targetX, tween(300))
+                                        
+                                        if (offsetX.value > 0) onSwipeRight(profile) else onSwipeLeft(profile)
+                                        
+                                        currentIndex++
+                                    } else {
+                                        // Return to center
+                                        launch { offsetX.animateTo(0f, tween(300)) }
+                                        launch { offsetY.animateTo(0f, tween(300)) }
+                                        launch { rotation.animateTo(0f, tween(300)) }
+                                    }
+                                }
+                            },
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                scope.launch {
+                                    offsetX.snapTo(offsetX.value + dragAmount.x)
+                                    offsetY.snapTo(offsetY.value + dragAmount.y)
+                                    rotation.snapTo(offsetX.value / 20f)
                                 }
                             }
-                        },
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-                            scope.launch {
-                                offsetX.snapTo(offsetX.value + dragAmount.x)
-                                offsetY.snapTo(offsetY.value + dragAmount.y)
-                                rotation.snapTo(offsetX.value / 20f)
-                            }
-                        }
-                    )
-                }
+                        )
+                    }
             )
         }
     }
