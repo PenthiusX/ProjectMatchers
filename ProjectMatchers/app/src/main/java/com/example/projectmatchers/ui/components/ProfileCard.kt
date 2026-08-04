@@ -19,6 +19,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.projectmatchers.data.model.UserProfile
 
+/**
+ * Displays a single user's profile information, including their image, name, age, and bio.
+ *
+ * @param profile The user profile data to display.
+ * @param modifier Modifier for this layout.
+ */
 @Composable
 fun ProfileCard(
     profile: UserProfile,

@@ -16,6 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * A row of buttons to perform actions like liking, disliking, or undoing a swipe.
+ *
+ * @param onDislike Callback for the dislike action.
+ * @param onLike Callback for the like action.
+ * @param onUndo Callback for the undo action.
+ * @param modifier Modifier for this layout.
+ */
 @Composable
 fun ActionButtons(
     onDislike: () -> Unit,

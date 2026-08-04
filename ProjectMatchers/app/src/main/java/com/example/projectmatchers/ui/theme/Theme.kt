@@ -33,6 +33,13 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+/**
+ * The default theme for the ProjectMatchers application.
+ *
+ * @param darkTheme Whether to use the dark theme variant.
+ * @param dynamicColor Whether to use dynamic color (Android 12+).
+ * @param content The composable content to be themed.
+ */
 @Composable
 fun ProjectMatchersTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

@@ -15,6 +15,9 @@ import com.example.projectmatchers.ui.discovery.DiscoveryScreen
 import com.example.projectmatchers.ui.theme.ProjectMatchersTheme
 
 class MainActivity : ComponentActivity() {
+    /**
+     * Called when the activity is first created. Sets up the UI using Jetpack Compose.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

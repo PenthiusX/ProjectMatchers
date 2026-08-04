@@ -16,6 +16,14 @@ import com.example.projectmatchers.data.model.UserProfile
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+/**
+ * A stack of swipeable profile cards. Handles drag gestures to trigger like/dislike actions.
+ *
+ * @param profiles List of user profiles to be shown in the stack.
+ * @param onSwipeLeft Callback triggered when a card is swiped to the left (dislike).
+ * @param onSwipeRight Callback triggered when a card is swiped to the right (like).
+ * @param modifier Modifier for this layout.
+ */
 @Composable
 fun SwipeCardStack(
     profiles: List<UserProfile>,
@@ -53,44 +61,44 @@ fun SwipeCardStack(
             ProfileCard(
                 profile = profile,
                 modifier = Modifier
-                    .graphicsLayer {
-                        translationX = offsetX.value
-                        translationY = offsetY.value
-                        rotationZ = rotation.value
-                    }
-                    .pointerInput(Unit) {
-                        detectDragGestures(
-                            onDragEnd = {
-                                scope.launch {
-                                    if (abs(offsetX.value) > screenWidthPx / 3) {
-                                        // Swipe away
-                                        val targetX = if (offsetX.value > 0) screenWidthPx * 2 else -screenWidthPx * 2
-                                        launch { offsetX.animateTo(targetX, tween(300)) }
-                                        
-                                        if (offsetX.value > 0) onSwipeRight(profile) else onSwipeLeft(profile)
-                                        
-                                        currentIndex++
-                                        offsetX.snapTo(0f)
-                                        offsetY.snapTo(0f)
-                                        rotation.snapTo(0f)
-                                    } else {
-                                        // Return to center
-                                        launch { offsetX.animateTo(0f, tween(300)) }
-                                        launch { offsetY.animateTo(0f, tween(300)) }
-                                        launch { rotation.animateTo(0f, tween(300)) }
-                                    }
-                                }
-                            },
-                            onDrag = { change, dragAmount ->
-                                change.consume()
-                                scope.launch {
-                                    offsetX.snapTo(offsetX.value + dragAmount.x)
-                                    offsetY.snapTo(offsetY.value + dragAmount.y)
-                                    rotation.snapTo(offsetX.value / 20f)
+                .graphicsLayer {
+                    translationX = offsetX.value
+                    translationY = offsetY.value
+                    rotationZ = rotation.value
+                }
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragEnd = {
+                            scope.launch {
+                                if (abs(offsetX.value) > screenWidthPx / 3) {
+                                    // Swipe away
+                                    val targetX = if (offsetX.value > 0) screenWidthPx * 2 else -screenWidthPx * 2
+                                    launch { offsetX.animateTo(targetX, tween(300)) }
+
+                                    if (offsetX.value > 0) onSwipeRight(profile) else onSwipeLeft(profile)
+
+                                    currentIndex++
+                                    offsetX.snapTo(0f)
+                                    offsetY.snapTo(0f)
+                                    rotation.snapTo(0f)
+                                } else {
+                                    // Return to center
+                                    launch { offsetX.animateTo(0f, tween(300)) }
+                                    launch { offsetY.animateTo(0f, tween(300)) }
+                                    launch { rotation.animateTo(0f, tween(300)) }
                                 }
                             }
-                        )
-                    }
+                        },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            scope.launch {
+                                offsetX.snapTo(offsetX.value + dragAmount.x)
+                                offsetY.snapTo(offsetY.value + dragAmount.y)
+                                rotation.snapTo(offsetX.value / 20f)
+                            }
+                        }
+                    )
+                }
             )
         }
     }
